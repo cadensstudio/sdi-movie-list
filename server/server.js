@@ -6,6 +6,7 @@ const app = express();
 const port = 3001;
 
 app.use(cors());
+app.use(express.json())
 
 app.get('/movies', (req, res) => {
   const { movieTitle } = req.query;
@@ -15,26 +16,26 @@ app.get('/movies', (req, res) => {
       .select('*')
       .where('title', movieTitleSpaces)
       .then(data => {
-        res.status(200).json(data)
+        res.status(200).send(data)
       })
-      .catch(err => res.status(404).json(err))
+      .catch(err => res.status(404).send(err))
   } else {
     knex('movie')
       .select('*')
-      .then(data => res.status(200).json(data))
-      .catch(err => res.status(404).json(err))
+      .then(data => res.status(200).send(data))
+      .catch(err => res.status(404).send(err))
   }
 });
 
-// /movies?movie=<movieTitle>
-// app.get('/movies/:movieTitle', (req, res) => {
-//   const { movieTitle } = req.params
-//   knex('movie')
-//     .select('*')
-//     .where('title', movieTitle)
-//     .then(data => res.status(200).json(data))
-//     .catch(err => res.status(404).json(err))
-// })
+app.post('/movies', (req, res) => {
+  let newMovie = req.body;
+  console.log(newMovie);
+  knex('movie')
+    .insert(newMovie)
+    .then(() => {
+      res.status(201).send(newMovie);
+    })
+});
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
